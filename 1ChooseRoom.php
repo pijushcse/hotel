@@ -1,9 +1,13 @@
+<?php 
+error_reporting(0);    
+?>
+
 <!doctype html>
 <html>
 
 <head>
     <meta charset="utf-8">
-    <title>Untitled Page</title>
+    <title>Choose Room</title>
     <meta name="generator" content="WYSIWYG Web Builder 12 Trial Version - http://www.wysiwygwebbuilder.com">
     <link href="chooseRoom.css" rel="stylesheet">
     <link href="1ChooseRoom.css" rel="stylesheet">
@@ -19,6 +23,10 @@
     $noOfKids = $_POST["noOfKids"];  
     $addressId = $_POST["address"];
     $roomTypeId  = $_POST["roomType"];
+    $secureId  = $_POST["secureuserid"];
+    $customerName = "";
+
+ 
     $sql  = "";
 
   
@@ -38,6 +46,16 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } else {
 
+    $userNameQ = "Select CONCAT(firstname, ' ', lastname) as name FROM user_information.user_details WHERE secure_login_id='".$secureId."' ";
+    $sqResult = $conn -> query($userNameQ);
+    
+    if ($sqResult->num_rows > 0) {
+      if ($row = $sqResult->fetch_assoc()) {
+          $customerName = $row["name"];
+      }}
+
+
+
     $sql    = "select r.id,
 	b.type as bedType,
 	room_desc,
@@ -54,15 +72,14 @@ where
 
     $result = $conn->query($sql);
 
-    // $sql    = "SELECT id, type FROM room_type";
-    // $result = $conn->query($sql);
+ 
 }
 
 ?>
 
  
  <script>
-        console.log("<?php echo $checkInDate.' - '.$checkInDate; ?>");
+        console.log("<?php echo $customerName; ?>");
         console.log("<?php echo $roomTypeId.' - '.$addressId; ?>");
  
             function reserveRoom(id) {
@@ -85,8 +102,48 @@ where
     </script> 
 
 <body>
+
+
+<?php 
+    if(strlen($customerName) == 0) {
+?>
+
+    <div id="wb_Form22" style="position:absolute;left:0px;top:1px;width::1226px;height:63px;z-index:9;">
+        <form name="Form2" method="post" enctype="text/plain" id="Form2">
+            <div id="wb_Text6" style="background-color: #87CEFA;position:absolute;left:900px;top:14px;width:94px;height:23px;z-index:0;">
+                <span style="color:#00008B;font-family:Georgia;font-size:14px;">
+                    <a href="signUp.php">Sign Up</a>
+                </span>
+            </div>
+            <div id="wb_Text5" style="background-color: #87CEFA;position:absolute;left:1000px;top:14px;width:96px;height:23px;z-index:1;">
+                <span style="color:#00008B;font-family:Georgia;font-size:14px;">
+                    <a href="signIn_up.php">Sign In</a>
+                </span>
+            </div>
+        </form>
+    </div>
+<?php 
+    } else {
+
+?>
+    <div id="wb_Form2" style="position:absolute;left:0px;top:1px;width::1226px;height:63px;z-index:9;">
+            <div id="wb_Text6" style="position:absolute;left:1100px;top:14px;width:350px;height:23px;z-index:0;">
+                <span style="color:#00008B;font-family:Georgia;font-size:12px;">
+                    <b> Welcome- <?php echo $customerName; ?></b>
+                </span>
+                <p> 
+    </p>
+                <span style="color:#00008B;font-family:Georgia;font-size:12px;">
+                    <a href="secureid=<?php echo $secureId; ?>">Sign Out</a>
+                </span>                
+            </div>
+
+    </div>
+    <?php } ?>
+
+
  
-    <div id="wb_Form1" style="position:absolute;left:1px;top:0px;width:1226px;height:967px;z-index:15;">
+    <div id="wb_Form1" style="position:absolute;left:1px;top:100px;width:1226px;height:967px;z-index:15;">
         <form name="Form1" method="post" action="mailto:yourname@yourdomain.com" enctype="text/plain" id="Form1">
             <div id="wb_TabMenu1" style="position:absolute;left:0px;top:215px;width:1224px;height:36px;z-index:5;overflow:hidden;">
                 <ul id="TabMenu1">
@@ -161,8 +218,8 @@ where
                             $sql2 = "SELECT COUNT(*) as cnt FROM reservation_confirmation WHERE room_fk=".$roomId; 
                             $bookedRoomCountResult = $conn->query($sql2);
                             $bookedRoomCount = 0;
-                            if($bookedRoomCountResult >0) {
-                            if ($counterRow = $bookedRoomCountResult->fetch_assoc()) {
+                            if ($bookedRoomCountResult->num_rows > 0) {
+                             if ($counterRow = $bookedRoomCountResult->fetch_assoc()) {
                                     $bookedRoomCount =  $counterRow["cnt"] ; 
                             }
                             $availableRoom = $availableRoom - $bookedRoomCount;
@@ -189,6 +246,7 @@ where
                 ?>
             </table>
 
+                       <input type="hidden" id="roomId" name="roomId"/>
                        <input type="hidden" id="roomTypeId" name="roomTypeId" value="<?php echo $roomTypeId; ?>"/>
                        <input type="hidden" id="checkInDate" name="checkInDate" value="<?php echo $checkInDate; ?>" />
                        <input type="hidden" id="checkOutDate" name="checkOutDate" value="<?php echo $checkOutDate; ?>"  />
@@ -196,6 +254,12 @@ where
                        <input type="hidden" id="noOfAdults" name="noOfAdults" value="<?php echo $noOfAdults; ?>"  />
                        <input type="hidden" id="noOfKids" name="noOfKids"  value="<?php echo $noOfKids; ?>"  />
                        <input type="hidden" id="address" name="address"  value="<?php echo $addressId; ?>"  />
+                       <input type="hidden" id="secureuserid" name="secureuserid"  value="<?php echo $secureId; ?>"  />
+
+                       <input type="hidden" id="customerName" name="customerName"  value="<?php echo ''; ?>"  />
+                       <input type="hidden" id="customerEmail" name="customerEmail"  value="<?php echo ''; ?>"  />
+                       <input type="hidden" id="customerPhone" name="customerPhone"  value="<?php echo ''; ?>"  />
+
 
         </form>
     </div>
@@ -203,7 +267,7 @@ where
         id="Marquee1">
         <span style="color:#0000CD;font-family:Georgia;font-size:20px;">Welcome!!!</span>
     </marquee>
-    <picture id="wb_Picture1" style="position:absolute;left:0px;top:0px;width:1227px;height:137px;z-index:17">
+    <picture id="wb_Picture1" style="position:absolute;left:0px;top:70px;width:1227px;height:150px;z-index:17">
         <img src="images/images.jpg" id="Picture1" alt="" srcset="">
     </picture>
 

@@ -61,7 +61,9 @@ function ValidateEmail(mail)
     $noOfAdults = $_POST["noOfAdults"];  
     $noOfKids = $_POST["noOfKids"];  
     $addressId = $_POST["address"];
-    $roomId  = $_POST["roomTypeId"];
+    $roomId  = $_POST["roomId"];
+    $secureId  = $_POST["secureuserid"];
+
     $customer_name = '';
     $customer_email  = '';
     $customer_phone = '';
@@ -79,6 +81,8 @@ $servername = "localhost";
 $username   = "root";
 $password   = "";
 $dbName     = "reservation";
+$customerName = "";
+
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbName);
@@ -87,6 +91,16 @@ $conn = new mysqli($servername, $username, $password, $dbName);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } else {
+
+
+    $userNameQ = "Select CONCAT(firstname, ' ', lastname) as name FROM user_information.user_details WHERE secure_login_id='".$secureId."' ";
+    $sqResult = $conn -> query($userNameQ);
+    
+    if ($sqResult->num_rows > 0) {
+      if ($row = $sqResult->fetch_assoc()) {
+          $customerName = $row["name"];
+      }}
+
 
     $sql    = "SELECT id, name FROM Country "  ;   
    $result = $conn->query($sql);
@@ -102,8 +116,48 @@ if ($conn->connect_error) {
  </script>
 
 <body>
+
+
+<?php 
+    if(strlen($customerName) == 0) {
+?>
+
+    <div id="wb_Form22" style="position:absolute;left:0px;top:1px;width::1226px;height:63px;z-index:9;">
+        <form name="Form2" method="post" enctype="text/plain" id="Form2">
+            <div id="wb_Text6" style="background-color: #87CEFA;position:absolute;left:900px;top:14px;width:94px;height:23px;z-index:0;">
+                <span style="color:#00008B;font-family:Georgia;font-size:14px;">
+                    <a href="signUp.php">Sign Up</a>
+                </span>
+            </div>
+            <div id="wb_Text5" style="background-color: #87CEFA;position:absolute;left:1000px;top:14px;width:96px;height:23px;z-index:1;">
+                <span style="color:#00008B;font-family:Georgia;font-size:14px;">
+                    <a href="signIn_up.php">Sign In</a>
+                </span>
+            </div>
+        </form>
+    </div>
+<?php 
+    } else {
+
+?>
+    <div id="wb_Form2" style="position:absolute;left:0px;top:1px;width::1226px;height:63px;z-index:9;">
+            <div id="wb_Text6" style="position:absolute;left:1100px;top:14px;width:350px;height:23px;z-index:0;">
+                <span style="color:#00008B;font-family:Georgia;font-size:12px;">
+                    <b> Welcome- <?php echo $customerName; ?></b>
+                </span>
+                <p> 
+    </p>
+                <span style="color:#00008B;font-family:Georgia;font-size:12px;">
+                    <a href="secureid=<?php echo $secureId; ?>">Sign Out</a>
+                </span>                
+            </div>
+
+    </div>
+    <?php } ?>
+
+
  
-        <div id="wb_Form2" style="position:absolute;left:0px;top:181px;width:1226px;height:34px;z-index:6;">
+        <div id="wb_Form2" style="position:absolute;left:0px;top:200px;width:1226px;height:34px;z-index:6;">
                 <form name="Form2" method="post" action="mailto:yourname@yourdomain.com" enctype="text/plain" id="Form2">
                     <div id="wb_Text2" style="position:absolute;left:97px;top:6px;width:58px;height:20px;z-index:0;">
                         <span style="color:#0000FF;font-family:Georgia;font-size:17px;">Offers</span>
@@ -120,7 +174,7 @@ if ($conn->connect_error) {
                 </form>
             </div>
 
-         <form id="roomChoose" method="POST" action="./1ChooseRoom.php">  
+         <form id="roomChoose" method="POST" action="./1ChooseRoom.php?secureuserid=<?php echo $secureId;?>">  
          <div id="wb_TabMenu1" style="position:absolute;left:0px;top:231px;width:1224px;height:36px;z-index:5;overflow:hidden;">
                 <ul id="TabMenu1">
                     <li>
@@ -200,7 +254,7 @@ if ($conn->connect_error) {
         id="Marquee1">
         <span style="color:#0000CD;font-family:Georgia;font-size:20px;">Welcome!!!</span>
     </marquee>
-    <picture id="wb_Picture1" style="position:absolute;left:0px;top:0px;width:1227px;height:137px;z-index:24">
+    <picture id="wb_Picture1" style="position:absolute;left:0px;top:60px;width:1227px;height:137px;z-index:24">
         <img src="images/images.jpg" id="Picture1" alt="" srcset="">
     </picture>
 

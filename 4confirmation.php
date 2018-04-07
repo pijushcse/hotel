@@ -65,8 +65,8 @@ if ($conn->connect_error) {
 ?>
 
 <script>
-  console.log("<?php echo $sqlget;  ?>");
-
+  console.log("<?php echo $roomId;  ?>");
+  console.log("<?php echo $bookingId;  ?>");
  </script>
 
 <body>

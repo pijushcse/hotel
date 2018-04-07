@@ -1,41 +1,6 @@
 <!doctype html>
 <html>
 
-<head>
-    <meta charset="utf-8">
-    <title>Reserve Room</title>
-    <link href="index.css" rel="stylesheet">
-    <link href="index.css" rel="stylesheet">
-    <script src="jquery-1.12.4.min.js"></script>
-    <script src="wwb12.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $("#Editbox4").change(function () {
-                ShowObject('', 1);
-            });
-            $("#Editbox4").trigger('change');
-        });
-
-        function searchRoom() {
-            var checkInDate = document.getElementById('Editbox2').value;
-            var checkOutDate = document.getElementById('Editbox3').value;
-            if(checkInDate > checkOutDate ) {
-                alert('Check out cannot be before check in date.');
-                return false;
-            }
-
-            var adultsCount = document.getElementById('Editbox5').value;
-            var roomCount = document.getElementById('Editbox4').value;
-
-            if(adultsCount/ 4 > roomCount ) {
-                alert('Only 4 persons are allowed in one room.');
-                return false;
-            }
-            
-            return true;
-        }
-    </script>
-</head>
 
 <?php
    $secureId = '';
@@ -43,6 +8,7 @@
     $secureId = $_GET['secureid'];
    }
    $customerName = '';
+   $captchaText = 'emoclew'; 
 
     $servername = "localhost";
     $username   = "root";
@@ -65,6 +31,13 @@
     while ($row = $sqResult->fetch_assoc()) {
         $customerName = $row["name"];
     }}
+    
+    $captchaTextQuery = "SELECT text FROM reservation.captcha  ORDER BY RAND() LIMIT 1";
+    $captchaTextResult =  $conn -> query($captchaTextQuery);
+    if ($captchaTextResult->num_rows > 0) {
+        if ($row = $captchaTextResult->fetch_assoc()) {
+            $captchaText = $row["text"];
+        }}
 
 
         $sql    = "SELECT id, type FROM room_type";
@@ -75,17 +48,65 @@
     }
 
 ?>
+<head>
+    <meta charset="utf-8">
+    <title>Reserve Room</title>
+    <link href="index.css" rel="stylesheet">
+    <link href="index.css" rel="stylesheet">
+    <script src="jquery-1.12.4.min.js"></script>
+    <script src="wwb12.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#Editbox4").change(function () {
+                ShowObject('', 1);
+            });
+            $("#Editbox4").trigger('change');
+        });
+
+        function searchRoom() {
+            var checkInDate = new Date( document.getElementById('Editbox2').value);
+            var checkOutDate = new Date(document.getElementById('Editbox3').value);
+            var currentDate = new Date() 
+            currentDate.setHours(0,0,0,0) ;            
+            if(checkInDate < currentDate) {
+                alert('Cannot select old date as check-in date.');
+                return false;
+            }
+            if(checkInDate > checkOutDate ) {
+                alert('Check out cannot be before check in date.');
+                return false;
+            }
+
+            var adultsCount = document.getElementById('Editbox5').value;
+            var roomCount = document.getElementById('Editbox4').value;
+
+            if(adultsCount/ 4 > roomCount ) {
+                alert('Only 4 persons are allowed in one room.');
+                return false;
+            }
+
+            var dbCaptchaText = "<?php echo $captchaText;  ?> " ;
+            var userCaptchaText = document.getElementById('captcha').value;
+             if(dbCaptchaText.trim() != userCaptchaText.trim()) {
+                alert(' Invalid captcha entered. Please try again. ');
+                location.reload();
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
 
 <script> 
     console.log("Customer name: ");
-    console.log("<?php echo 'Password- '.$userNameQ ; ?>");
+    console.log("<?php echo 'Password- '.$captchaText ; ?>");
 
 </script>
 
 <body>
 
 <?php 
-    if(strlen($secureId) == 0) {
+    if(strlen($customerName) == 0) {
 ?>
 
     <div id="wb_Form2" style="position:absolute;left:100px;top:1px;width:1100px;height:63px;z-index:9;">
@@ -114,7 +135,7 @@
                 <p> 
     </p>
                 <span style="color:#00008B;font-family:Georgia;font-size:12px;">
-                    <a href="index.php">Sign Out</a>
+                    <a href="index.php?secureid=<?php echo $secureId.'1'; ?>">Sign Out</a>
                 </span>                
             </div>
 
@@ -163,15 +184,15 @@
         <span style="color:#FFFFFF;font-family:Georgia;font-size:19px;">Check In</span>
     </div>
 
-<form id="mainForm" method="POST" action="1ChooseRoom.php" >
+<form id="mainForm" method="POST" action="1ChooseRoom.php?secureid=<?php echo $secureId; ?>" >
 
     <input type="date" id="Editbox2" style="position:absolute;left:110px;top:297px;width:120px;height:16px;line-height:16px;z-index:15;"
-        name="checkInDate" value="<?php echo date('Y-m-d', time() - 86400); ?>" spellcheck="false">
+        name="checkInDate" value="<?php echo date('Y-m-d', time() + 86400); ?>" spellcheck="false">
     <div id="wb_Text9" style="position:absolute;left:250px;top:272px;width:321px;height:23px;z-index:16;">
         <span style="color:#FFFFFF;font-family:Georgia;font-size:19px;">Check Out</span>
     </div>
     <input type="date" id="Editbox3" style="position:absolute;left:250px;top:297px;width:156px;height:16px;line-height:16px;z-index:17;"
-        name="checkOutDate"  value="<?php echo date('Y-m-d', time() + 86400); ?>" spellcheck="false">
+        name="checkOutDate"  value="<?php echo date('Y-m-d', time() + 86400*2); ?>" spellcheck="false">
     <div id="wb_Text10" style="position:absolute;left:110px;top:350px;width:87px;height:23px;z-index:18;">
         <span style="color:#FFFFFF;font-family:Georgia;font-size:19px;">Rooms</span>
     </div>
@@ -182,13 +203,13 @@
     <input type="number" id="Editbox6" style="position:absolute;left:251px;top:447px;width:157px;height:16px;line-height:16px;z-index:21;"
         name="noOfKids" value="1" min="0" max="20" spellcheck="false">
     <div id="wb_Text11" style="position:absolute;left:110px;top:424px;width:60px;height:23px;z-index:22;">
-        <span style="color:#FFFFFF;font-family:Georgia;font-size:19px;">Adult</span>
+        <span style="color:#FFFFFF;font-family:Georgia;font-size:19px;">Adults</span>
     </div>
     <div id="wb_Text12" style="position:absolute;left:251px;top:420px;width:87px;height:23px;z-index:23;">
-        <span style="color:#FFFFFF;font-family:Georgia;font-size:19px;">Children</span>
+        <span style="color:#FFFFFF;font-family:Georgia;font-size:19px;">Childrens</span>
     </div>
-    <input type="submit" id="Button1" onclick="return searchRoom();  " name="" value="Submit" style="position:absolute;left:110px;top:575px;width:117px;height:25px;z-index:24;">
-    <input type="reset" id="Button2" value="Reset" style="position:absolute;left:250px;top:575px;width:96px;height:25px;z-index:25;">
+    <input type="submit" id="Button1" onclick="return searchRoom();  " name="" value="Submit" style="position:absolute;left:110px;top:620px;width:117px;height:35px;z-index:24;">
+    <input type="reset" id="Button2" value="Reset" style="position:absolute;left:250px;top:620px;width:96px;height:35px;z-index:25;">
     <div id="wb_Text13" style="position:absolute;left:251px;top:350px;width:120px;height:23px;z-index:26;">
         <span style="color:#FFFFFF;font-family:Georgia;font-size:19px;">Room Type</span>
     </div>
@@ -212,6 +233,24 @@
             }        
         ?>
     </select>
+
+    <div  style=" background-color: white;position:absolute;left:110px;top:500px;width:170px;height:50px;z-index:22;">
+    <svg  xmlns="http://www.w3.org/2000/svg">
+        <g>
+             <rect x="0" y="0" width="170" height="50" fill="red"></rect>
+             <text x="15" y="30"  style="font-family:Arial; font-style: italic; font-weight:bold; font-size : 18; stroke:#000000; fill:#00ff00;" fill="blue"><?php echo $captchaText; ?></text>
+         </g>
+    </svg>
+    </div>
+
+    <div  style=" position:absolute;left:300px;top:500px;width:170px;height:50px;z-index:22;">
+     <input id="captcha"  type="text" placeholder="Enter captcha"     style="position:absolute;width:117px;height:40px;z-index:24;">
+
+                       <input type="hidden" id="secureuserid" name="secureuserid"  value="<?php echo $secureId; ?>"  />
+
+
+    </div>
+
 
 </form> 
 
