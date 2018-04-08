@@ -1,9 +1,13 @@
+<?php 
+error_reporting(0);    
+?>
+
 <!doctype html>
 <html>
 
 <head>
     <meta charset="utf-8">
-    <title>Untitled Page</title>
+    <title>Sign In</title>
     <meta name="generator" content="WYSIWYG Web Builder 12 Trial Version - http://www.wysiwygwebbuilder.com">
     <link href="signIn.css" rel="stylesheet">
     <link href="signIn_up.css" rel="stylesheet">
@@ -34,8 +38,12 @@ $customerName = '';
                 if ($row = $checkResult->fetch_assoc()) {
                     $customerName = $row["name"];
                     header('Location: ./index.php?secureid='.$customerName);
-            }
-           }
+             } 
+           } else {
+                echo '<script language="javascript">';
+                echo 'alert("Invalid username/ password. Please try again.")';
+                echo '</script>';            
+             }
         }
     }
 

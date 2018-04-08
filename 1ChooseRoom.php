@@ -134,7 +134,7 @@ where
                 <p> 
     </p>
                 <span style="color:#00008B;font-family:Georgia;font-size:12px;">
-                    <a href="secureid=<?php echo $secureId; ?>">Sign Out</a>
+                    <a href="signIn_up.php">Sign Out</a>
                 </span>                
             </div>
 

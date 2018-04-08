@@ -1,3 +1,7 @@
+<?php 
+error_reporting(0);    
+?>
+
 <!doctype html>
 <html>
 
@@ -8,13 +12,13 @@
     $secureId = $_GET['secureid'];
    }
    $customerName = '';
-   $captchaText = 'emoclew'; 
+   $captchaText = ''; 
 
     $servername = "localhost";
     $username   = "root";
     $password   = "";
     $dbName     = "reservation";
-    $hashed_pwd = password_hash($password, PASSWORD_DEFAULT);
+   // $hashed_pwd = password_hash($password, PASSWORD_DEFAULT);
 
     // Create connection
     $conn = new mysqli($servername, $username, $password, $dbName);
@@ -24,14 +28,16 @@
         die("Connection failed: " . $conn->connect_error);
     } else {
 
+$userNameQ = '';
+if(strlen($secureId) > 0) {
   $userNameQ = "Select CONCAT(firstname, ' ', lastname) as name FROM user_information.user_details WHERE secure_login_id='".$secureId."' ";
   $sqResult = $conn -> query($userNameQ);
   
   if ($sqResult->num_rows > 0) {
-    while ($row = $sqResult->fetch_assoc()) {
+    if ($row = $sqResult->fetch_assoc()) {
         $customerName = $row["name"];
     }}
-    
+}   
     $captchaTextQuery = "SELECT text FROM reservation.captcha  ORDER BY RAND() LIMIT 1";
     $captchaTextResult =  $conn -> query($captchaTextQuery);
     if ($captchaTextResult->num_rows > 0) {
@@ -99,7 +105,7 @@
 
 <script> 
     console.log("Customer name: ");
-    console.log("<?php echo 'Password- '.$captchaText ; ?>");
+    console.log("<?php echo 'Query- '.$userNameQ ; ?>");
 
 </script>
 
@@ -135,7 +141,7 @@
                 <p> 
     </p>
                 <span style="color:#00008B;font-family:Georgia;font-size:12px;">
-                    <a href="index.php?secureid=<?php echo $secureId.'1'; ?>">Sign Out</a>
+                    <a href="signIn_up.php">Sign Out</a>
                 </span>                
             </div>
 

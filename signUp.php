@@ -1,13 +1,42 @@
+<?php 
+error_reporting(0);    
+?>
+
 <!doctype html>
 <html>
 
 <head>
     <meta charset="utf-8">
     <title>Untitled Page</title>
-    <meta name="generator" content="WYSIWYG Web Builder 12 Trial Version - http://www.wysiwygwebbuilder.com">
     <link href="Untitled2.css" rel="stylesheet">
     <link href="signUp.css" rel="stylesheet">
 </head>
+
+<script>
+    function signup() {
+            var firstName = new Date( document.getElementById('firstName').value);
+            var middleName = new Date( document.getElementById('middleName').value);
+            var lastName = new Date( document.getElementById('lastName').value);
+            var userName = new Date( document.getElementById('userName').value);
+            var email = new Date( document.getElementById('email').value);
+            var password = new Date( document.getElementById('password').value);
+            var confPassword = new Date( document.getElementById('confPassword').value);
+
+            if(firstName.length ==0 || userName.length ==0 || lastName.length ==0 || 
+            email.length ==0 || password.length ==0 ||  confPassword.length ==0) {
+                alert ('All * fields are mandatory.');
+                return false; 
+            }
+
+            if(password === confPassword) {
+                return true; 
+            } else {
+                alert ('Password are not identical');
+                return false;
+            }
+        return true;
+    }
+</script>
 
  <?php
         $firstName = '';
@@ -63,20 +92,17 @@
                 if ($row = $checkResult->fetch_assoc()) {
                     if($row["CNT"] > 0)  {
                         $userExists = 'EXISTS';
+                    } else {
+                        $sql    = "INSERT INTO user_details( FirstName, MiddleName, LastName, UserName, Phone, Email, address, password, secure_login_id) VALUES('".$firstName."', '".$middleName."', '".$lastName."', SHA2(UPPER('".$userIdName."'), 512), '".$phone."', '".$email."', '".$address."', SHA2('".$userPassword."', 512), '".$secureId."') " ;
+                        $result = $conn->query($sql);
+                        $userId = $conn -> insert_id;
+                            if($userId >0) {
+                                header("Location: ./signIn_up.php");
+                            }                                    
                     }
                 }
             }
 
-
-            if($userExists == 'NOTEXISTS') {
-            $sql    = "INSERT INTO user_details( FirstName, MiddleName, LastName, UserName, Phone, Email, address, password, secure_login_id) " .
-              " VALUES('".$firstName."', '".$middleName."', '".$lastName."', SHA2(UPPER('".$userIdName."'), 512), '".$phone."', '".$email."', '".$address."', SHA2('".$userPassword."', 512), '".$secureId."') " ;
-            $result = $conn->query($sql);
-            $userId = $conn -> insert_id;
-                if($userId >0) {
-                    header("Location: ./signIn_up.php");
-                }
-            }
         }
       } else {
         $error = 'ERROR' ;
@@ -102,9 +128,7 @@
   </script>
 
 <body>
-    <a href="http://www.wysiwygwebbuilder.com" target="_blank">
-        <img src="images/builtwithwwb12.png" alt="WYSIWYG Web Builder" style="position:absolute;left:441px;top:967px;border-width:0;z-index:250">
-    </a>
+
     <div id="wb_Form1" style="position:absolute;left:10px;top:4px;width:1258px;height:862px;z-index:23;">
         <form name="Form1" method="post" action="signUp.php" id="signUpForm">
             <div id="wb_Text1" style="position:absolute;left:146px;top:0px;width:249px;height:18px;z-index:0;">
@@ -121,7 +145,7 @@
             <input type="email" id="email" style="position:absolute;left:170px;top:286px;width:398px;height:16px;line-height:16px;z-index:5;"
                 name="email" value="" spellcheck="false">
             <input type="text" id="address" style="position:absolute;left:170px;top:329px;width:398px;height:16px;line-height:16px;z-index:6;"
-                name="address   " value="" spellcheck="false">
+                name="address" value="" spellcheck="false">
             <input type="password" id="password" style="position:absolute;left:168px;top:366px;width:398px;height:16px;line-height:16px;z-index:7;"
                 name="password" value="" spellcheck="false">
             <input type="password" id="confPassword" style="position:absolute;left:168px;top:403px;width:398px;height:16px;line-height:16px;z-index:8;"

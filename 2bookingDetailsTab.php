@@ -1,3 +1,6 @@
+<?php 
+error_reporting(0);    
+?>
 <!doctype html>
 <html>
 
@@ -20,12 +23,12 @@ function validateData() {
         return false;
     }
 
-    if(customerPhone.length !=10) {
-        alert("Please enter a valid phone number.");
-            return false;    
-    }
+        var re16digit=/^\d{10}$/
+                if (customerPhone.search(re16digit)==-1){
+                  alert("Please enter a valid phone number.");
+                    return false;  
+            }
 
-    
 return ValidateEmail(customerEmail);
 }
 
@@ -148,7 +151,7 @@ if ($conn->connect_error) {
                 <p> 
     </p>
                 <span style="color:#00008B;font-family:Georgia;font-size:12px;">
-                    <a href="secureid=<?php echo $secureId; ?>">Sign Out</a>
+                    <a href="signIn_up.php">Sign Out</a>
                 </span>                
             </div>
 
@@ -201,6 +204,8 @@ if ($conn->connect_error) {
                        <input type="hidden" id="addressId" name="addressId"  value="<?php echo $addressId; ?>"  />
                        <input type="hidden" id="address" name="address"  value="<?php echo $addressId; ?>"  />
                        <input type="hidden" id="roomType" name="roomType"  value="<?php echo $roomId; ?>"  />
+                       <input type="hidden" id="secureuserid" name="secureuserid"  value="<?php echo $secureId; ?>"  />
+
 
         </form>
 
@@ -247,6 +252,8 @@ if ($conn->connect_error) {
                        <input type="hidden" id="addressId" name="addressId"  value="<?php echo $addressId; ?>"  />
                        <input type="hidden" id="address" name="address"  value="<?php echo $addressId; ?>"  />
                         <input type="hidden" id="roomType" name="roomType"  value="<?php echo $roomId; ?>"  />
+                        <input type="hidden" id="secureuserid" name="secureuserid"  value="<?php echo $secureId; ?>"  />
+
 
         </form>
     </div>
